@@ -1,42 +1,23 @@
 ---
 layout:     post
-title:      Pixyll in Action
-date:       2014-06-10 12:31:19
-summary:    See what the different elements looks like. Your markdown has never looked better. I promise.
+title:      My first Blog Post
+date:       2015-03-30 11:22:19
+summary:    I'll explore my Blog Themes possibilities
 categories: jekyll pixyll
 ---
 
-There is a significant amount of subtle, yet precisely calibrated, styling to ensure
-that your content is emphasized while still looking aesthetically pleasing.
+I'll soon start blogging about my Adventures in Web Development with [PureScript](http://purescript.org).
 
-All links are easy to [locate and discern](#), yet don't detract from the [harmony
-of a paragraph](#). The _same_ goes for italics and __bold__ elements. Even the the strikeout
-works if <del>for some reason you need to update your post</del>. For consistency's sake,
-<ins>The same goes for insertions</ins>, of course.
+### Source Code
 
-### Code, with syntax highlighting
+Code blocks use the [solarized](http://ethanschoonover.com/solarized) theme. 
+I switched out solarized dark for the light version because i usually prefer it that way. 
 
-Here's an example of some ruby code with line anchors.
-
-{% highlight ruby lineanchors %}
-# The most awesome of classes
-class Awesome < ActiveRecord::Base
-  include EvenMoreAwesome
-
-  validates_presence_of :something
-  validates :email, email_format: true
-
-  def initialize(email, name = nil)
-    self.email = email
-    self.name = name
-    self.favorite_number = 12
-    puts 'created awesomeness'
-  end
-
-  def email_format
-    email =~ /\S+@\S+\.\S+/
-  end
-end
+{% highlight purescript %}
+deleteBlock :: Block -> AppState -> AppState
+deleteBlock b as = as { blocks = filter (\b' -> b' /= b ) as.blocks
+                      , timeslots = M.fromList $ topicslotFilter (M.toList as.timeslots)}
+  where topicslotFilter = filter (\(Tuple (Slot s) _) -> s.block /= b)
 {% endhighlight %}
 
 Here's some CSS:
