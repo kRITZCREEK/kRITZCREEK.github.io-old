@@ -1,8 +1,8 @@
 # Site settings
-title:       Almost functional
+title:       Coding in a post-JavaScript world
 email:       christoph.hegemann1337@gmail.com
 author:      Christoph Hegemann
-description: "Chronicles of an aspiring functional programmer."
+description: "Functional web-programming. Focus on Haskell and PureScript."
 baseurl:     ""
 url:         "https://kRITZCREEK.github.io"
 date_format: "%b %-d, %Y"
