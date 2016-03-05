@@ -12,6 +12,9 @@ categories: tutorial
 
 Last time I left you hanging with a still Tic-Tac-Toe board. Time to make it come to life! We'll be using the [purescript-signal](https://github.com/bodil/purescript-signal) library from Bodil Stokke(@bodil), which ports the underlying abstraction of the [Elm programming language](http://elm-lang.org/), *Signals*, to PureScript.
 
+To install the `purescript-signal` library into our existing project we can run
+`bower i -S purescript-signal` in the projects rootfolder.
+
 Signals and you!
 ----------------
 
@@ -59,9 +62,9 @@ Additionally we'll define a helper that takes a GameState and a Channel and cons
 ``` haskell
   type State a = { board :: Board, currentPlayer :: Token | a }
   type GameState = State ()
-  type Environment = State (channel :: C.Channel Action)
+  type Environment = State (channel :: Channel Action)
 
-  mkEnv :: C.Channel Action -> GameState -> Environment
+  mkEnv :: Channel Action -> GameState -> Environment
   mkEnv channel gameState = {
     board: gameState.board,
     currentPlayer: gameState.currentPlayer,
@@ -138,14 +141,16 @@ Since we'll start to put tokens onto the board we need to add the companion of o
 In contrast to a static board an ongoing game of Tic-Tac-Toe also has a currently active player.
 
 ``` haskell
+  +newGameState :: GameState
   +newGameState = {currentPlayer: X, board: replicate 9 E}
 ```
 
 We add a little wrapper around our existing grid which contains a button to restart the game and a textfield showing the currently active player. On clicking the newGameButton we send a NewGame action.
 
 ``` haskell
+  +newGameButton :: Channel Action -> ReactElement
   +newGameButton c =
-  +  D.button [P.onClick (\_ -> C.send c NewGame)] [D.text "New Game"]
+  +  D.button [P.onClick (\_ -> send c NewGame)] [D.text "New Game"]
 
   +game :: Environment -> ReactElement
   +game env = D.div'
@@ -163,7 +168,7 @@ When the user clicks one of the cells we'll send a Click action which contains t
   +cell :: Environment -> Int -> Int -> ReactElement
   +cell env x y = D.td
   +  [P.className (classForToken token)
-  +  , P.onClick (\_ -> C.send env.channel (Click x y))]
+  +  , P.onClick (\_ -> send env.channel (Click x y))]
 ```
 
 Putting it together
@@ -174,18 +179,16 @@ Let's look at the main function *Literate Programming Style!*
 We've got an initial State...
 
 ``` haskell
-
   main = do
     body' <- getBody
 
-    channel <- C.channel NewGame
+    channel <- channel NewGame
 ```
 
 ... and a Signal of Actions from the view.
 
 ``` haskell
-
-  let actions = C.subscribe channel
+  let actions = subscribe channel
 ```
 
 Using the `foldp` function we can then fold an initial GameState and our Signal of Actions into a Signal of GameStates...
@@ -197,13 +200,13 @@ Using the `foldp` function we can then fold an initial GameState and our Signal 
 ... over which we then map(~&gt;) a function...
 
 ``` haskell
-  let game = gameState S.~>
+  let gameS = gameState S.~>
 ```
 
 that adds the channel to our GameState so that the view can send new Actions...
 
 ``` haskell
-  mkEnv channel >>>
+    mkEnv channel >>>
 ```
 
 ... and renders it to the screen using our render function.
@@ -215,7 +218,7 @@ that adds the channel to our GameState so that the view can send new Actions...
 Now all that is left is to turn that Signal of UI into an effectful computation...
 
 ``` haskell
-  S.runSignal game
+  S.runSignal gameS
 ```
 
 ... and we're done!
