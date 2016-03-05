@@ -14,15 +14,19 @@ Setting up our project
 We'll start of by creating a new project with [pulp](https://github.com/bodil/pulp):
 
 ``` bash
-  mkdir tic-tac-toe
-  cd tic-tac-toe
-  pulp init
+  $ mkdir tic-tac-toe
+  $ cd tic-tac-toe
+  $ pulp init
 ```
 
-We'll also install some needed dependencies:
+We'll also install some needed dependencies using npm and bower:
 
 ``` bash
-  pulp dep install --save purescript-react purescript-arrays
+  $ bower install -S purescript-react purescript-react-dom \
+                     purescript-arrays purescript-nullable \
+                     purescript-dom
+  
+  $ npm install react react-dom
 ```
 
 Now let's put these snippets in the root folder of your project and we're good to go.
@@ -41,23 +45,23 @@ The remaining blogpost is a literate sourcefile which should go into your src/Ma
 ``` haskell
   module Main where
 
-  import           Control.Monad.Eff
-  import           Data.Array (replicate, (!!))
-  import           Data.Maybe (Maybe(..))
-  import           Data.Maybe.Unsafe (fromJust)
-  import           Data.Nullable (toMaybe)
-  import           Prelude
+  import Control.Monad.Eff (Eff)
+  import Data.Array (replicate, (!!))
+  import Data.Maybe (Maybe())
+  import Data.Maybe.Unsafe (fromJust)
+  import Data.Nullable (toMaybe)
+  import Prelude
 
-  import           DOM (DOM())
-  import           DOM.HTML (window)
-  import           DOM.HTML.Document (body)
-  import           DOM.HTML.Types (htmlElementToElement)
-  import           DOM.HTML.Window (document)
-  import           DOM.Node.Types (Element())
+  import DOM (DOM)
+  import DOM.HTML (window)
+  import DOM.HTML.Document (body)
+  import DOM.HTML.Types (htmlElementToElement)
+  import DOM.HTML.Window (document)
 
-  import           React
-  import qualified React.DOM as D
-  import qualified React.DOM.Props as P
+  import React (ReactElement, ReactClass, createFactory, spec, createClass)
+  import ReactDOM (render)
+  import React.DOM as D
+  import React.DOM.Props as P
 ```
 
 ### Datatypes and Accessors
@@ -82,6 +86,7 @@ We'll also define a `Show` instance for our Token datatype, so that we can displ
 Lastly we'll write a method that generates some CSS classes for the different Tokens, so we can later style them on the webpage.
 
 ``` haskell
+  classForToken :: Token -> String
   classForToken X = "cell x"
   classForToken O = "cell o"
   classForToken E = "cell"
@@ -109,6 +114,7 @@ In order to have a board that we can render we'll construct the following board:
 ```
 
 ``` haskell
+  newBoard :: Board
   newBoard = replicate 3 O ++ replicate 3 X ++ replicate 3 O
 ```
 
@@ -151,9 +157,10 @@ For the cell we extract the token at the corresponding field inside our boardsta
 Our main method handles placing our boardComponent inside the body element of our page. The most interesting part is the argument to the `ui` function, which is the boardstate that we want to display. You can play around with it and change `newBoard` to something like \[X,X,X,E,X,X,X,X,O\].
 
 ``` haskell
+  main :: forall eff. Eff (dom :: DOM | eff) Unit
   main = do
     body' <- getBody
-    render (ui newBoard) body'
+    void (render (ui newBoard) body')
     where
       ui board = D.div' [ createFactory (boardComponent board) unit ]
 
